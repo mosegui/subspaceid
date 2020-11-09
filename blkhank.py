@@ -1,23 +1,31 @@
+import numba
 import numpy as np
 
 
-def hankel_matrix(y, i, j):
+@numba.njit()
+def shifted_tile(y, i, j):
     l, nd = y.shape
     if nd < l:
         y = y.conj().T
         l, nd = y.shape
 
-    if i < 0:
-        raise ValueError("i should be positive")
-    if j < 0:
-        raise ValueError("j should be positive")
-    if j > nd - i + 1:
-        raise ValueError("j too big")
-
     H = np.zeros((l*i, j))
     for k in range(i):
-        # H[k*l : (k+1)*l, :] = y[:, k : k+j]
-        # H[(k - 1) * l + 1: k * l, :] = y[:, k: k + j - 1]
         H[k * l: (k + 1) * l, :] = y[:, k:k + j]
-
     return H
+
+
+def hankel_matrix(y, i, j):
+
+    assert i >= 0, "i should be non-negative"
+    assert j >= 0, "j should be non-negative"
+
+    observations, dimensions = y.shape
+    _msg = "data must be passed in column format, rows being the data observations and columns the" \
+           "data dimensions"
+    assert observations > dimensions, _msg
+
+    if j > observations - i + 1:
+        raise ValueError("j too big")
+
+    return shifted_tile(y, i, j)

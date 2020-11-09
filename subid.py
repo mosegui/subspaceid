@@ -41,7 +41,7 @@ def subid(y, i, n, u=None, w=None):
 
     if i < 0:
         raise ValueError("Number of block rows should be positive")
-    if l <0:
+    if l < 0:
         raise ValueError("Need a non-empty output vector")
 
     if id_type == "deterministic":
@@ -86,10 +86,10 @@ def subid(y, i, n, u=None, w=None):
     j = ny - 2 * i + 1
 
     # Compute the R factor
-    Y = hankel_matrix(y/np.sqrt(j), 2*i, j)
+    Y = hankel_matrix(y.conj().T/np.sqrt(j), 2*i, j)
 
     if id_type == "deterministic":
-        U = hankel_matrix(u / np.sqrt(j), 2 * i, j)
+        U = hankel_matrix(u.conj().T/ np.sqrt(j), 2 * i, j)
         R = np.triu(np.linalg.qr(np.vstack((U,Y)).conj().T, mode='complete')[1]).conj().T  # R factor
     else:
         R = np.triu(np.linalg.qr(Y.conj().T, mode='complete')[1]).conj().T
