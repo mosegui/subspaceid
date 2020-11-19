@@ -16,6 +16,10 @@ The present tests for a first-order linear system:
 are described in book section 2.3.3: Notes on noisy measurements. Pages 47 trough 49.
 """
 
+
+INPUT_LENGTH = 1000
+
+
 @pytest.fixture(scope="module")
 def first_order_system():
     """Generates and returns the input and output signals of a
@@ -30,8 +34,8 @@ def first_order_system():
 
     bf, af = scipy.signal.butter(2, 0.3, 'low')
 
-    input_gen = scipy.signal.lfilter(bf, af, np.random.randn(1000))
-    ur = (input_gen + 0.1 * np.random.randn(1000)).reshape(-1, 1)
+    input_gen = scipy.signal.lfilter(bf, af, np.random.randn(INPUT_LENGTH))
+    ur = (input_gen + 0.1 * np.random.randn(INPUT_LENGTH)).reshape(-1, 1)
     dt = 1
 
     syst = (a, b, c, d, dt)
@@ -55,7 +59,7 @@ def test_white_noise_output(first_order_system):
     num_exps = 200
 
     for k in range(num_exps):
-        y = yr + 0.1 * np.random.randn(1000).reshape(-1, 1)
+        y = yr + 0.1 * np.random.randn(INPUT_LENGTH).reshape(-1, 1)
         u = ur
 
         A, B, C, D, ss = subid_det(y, i, n, u)
@@ -79,8 +83,8 @@ def test_white_noise_input_n_output(first_order_system):
     num_exps = 200
 
     for k in range(num_exps):
-        y = yr + 0.1 * np.random.randn(1000).reshape(-1, 1)
-        u = ur + 0.1 * np.random.randn(1000).reshape(-1, 1)
+        y = yr + 0.1 * np.random.randn(INPUT_LENGTH).reshape(-1, 1)
+        u = ur + 0.1 * np.random.randn(INPUT_LENGTH).reshape(-1, 1)
 
         A, B, C, D, ss = subid_det(y, i, n, u)
         list_of_As.append(A[0][0])
@@ -108,7 +112,7 @@ def test_coloured_noise_output(first_order_system):
     ac = [1, -0.85]
 
     for k in range(num_exps):
-        output_gen = scipy.signal.lfilter(bc, ac, np.random.randn(1000))
+        output_gen = scipy.signal.lfilter(bc, ac, np.random.randn(INPUT_LENGTH))
         y = yr + output_gen.reshape(-1, 1)
         u = ur
 
@@ -118,9 +122,6 @@ def test_coloured_noise_output(first_order_system):
 
     np.testing.assert_allclose(np.mean(list_of_As), expected_a, atol=1e-3)
     np.testing.assert_allclose(np.mean(list_of_Ds), expected_d, atol=1e-3)
-
-
-INPUT_LENGTH = 1000
 
 
 @pytest.fixture(scope="module")
