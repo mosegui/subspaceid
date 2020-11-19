@@ -59,22 +59,13 @@ def subid_det(y, i, n, u, w="SV"):
     R = np.triu(np.linalg.qr(np.vstack((U,Y)).conj().T, mode='complete')[1]).conj().T  # R factor
     R = R[: 2 * i * (m + l), : 2 * i * (m + l)]
 
-    ######################################################
-    #                       STEP 1                       #
-    ######################################################
     # Calculate oblique projection
     Rf = R[(2*m+l)*i:, :]  # Future outputs
     Rp = np.vstack((R[:m * i,:], R[2 * m * i: (2 * m + l) * i, :]))  # Past(inputs and) outputs
     Ru = R[m * i:2 * m * i, :]  # Future inputs
-    # Ru = R[m * i:2 * m * i, :mi2]  # Future inputs
 
-    # Perpendicular Future outputs
-    Rfp = project_on_perpendicular(Rf, Ru)
-    # Rfp = np.hstack((project_on_perpendicular(Rf[:, :mi2], Ru[:, :mi2]), Rf[:, mi2:]))
-
-    # Perpendicular Past
-    Rpp = project_on_perpendicular(Rp, Ru)
-    # Rpp = np.hstack((project_on_perpendicular(Rp[:, :mi2], Ru[:, :mi2]), Rp[:, mi2:]))
+    Rfp = project_on_perpendicular(Rf, Ru)  # Perpendicular Future outputs
+    Rpp = project_on_perpendicular(Rp, Ru)  # Perpendicular Past
 
     # The oblique projection "obl/Ufp = Yf/Ufp * pinv(Wp/Ufp) * Wp" Computed as 6.1 on page 166
     Ob = matdiv(Rfp, Rpp) @ Rp
@@ -85,39 +76,24 @@ def subid_det(y, i, n, u, w="SV"):
     # else:
     #     Ob = matdiv(Rfp, Rpp) @ Rp
 
-    # ######################################################
-    # #                       STEP 2                       #
-    # ######################################################
     # Compute the SVD
     U, S, V = np.linalg.svd(Ob)
     ss = np.diag(S)
 
-    # ######################################################
-    # #                       STEP 3                       #
-    # ######################################################
     # Determine the order from the singular values
     U1 = U[:, :n]
 
-    # ######################################################
-    # #                       STEP 4                       #
-    # ######################################################
      # Determine gam and gamm
     gam = U1 @ np.diag(np.sqrt(np.diag(ss[:n])))
     gamm = gam[:l*(i-1), :]
 
-    # ######################################################
-    # #                       STEP 5                       #
-    # ######################################################
     # Compute Obm (the second oblique projection)
     Rf = R[(2 * m + l) * i + l:, :]
     Rp = np.vstack((R[:m * (i + 1), :], R[2 * m * i: (2 * m + l) * i + l, :]))
     Ru = R[m * i + m:2 * m * i, :]
 
     Rfp = project_on_perpendicular(Rf, Ru)
-    # Rfp = np.hstack((project_on_perpendicular(Rf[:, :mi2], Ru[:, :mi2]), Rf[:, mi2:]))
-
     Rpp = project_on_perpendicular(Rp, Ru)
-    # Rpp = np.hstack((project_on_perpendicular(Rp[:, :mi2], Ru[:, :mi2]), Rp[:, mi2:]))
 
     Obm = matdiv(Rfp, Rpp) @ Rp
 
@@ -131,10 +107,7 @@ def subid_det(y, i, n, u, w="SV"):
     Xi  = np.linalg.pinv(gam) @ Ob
     Xip = np.linalg.pinv(gamm) @ Obm
 
-    # ######################################################
-    # #                       STEP 6                       #
-    # ######################################################
-
+    # Solve linear system of equations
     Rhs = np.vstack((Xi, R[m * i: m * (i + 1), :]))
     Lhs = np.vstack((Xip, R[(2 * m + l) * i: (2 * m + l) * i + l, :]))
 
