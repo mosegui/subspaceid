@@ -1,3 +1,11 @@
+"""
+The content of this module is based on the original work:
+
+    "Subspace Identification for Linear Systems, Theory, Implementation, Applications"
+                           Van Overschee P., De Moor B.
+                        Kluwer Academic Publishers, (1996)
+"""
+
 import numpy as np
 import scipy.signal
 

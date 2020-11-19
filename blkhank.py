@@ -1,6 +1,13 @@
+"""
+The content of this module is based on the original work:
+
+    "Subspace Identification for Linear Systems, Theory, Implementation, Applications"
+                           Van Overschee P., De Moor B.
+                        Kluwer Academic Publishers, (1996)
+"""
+
 import numba
 import numpy as np
-
 
 @numba.njit()
 def shifted_tile(y, i, j):

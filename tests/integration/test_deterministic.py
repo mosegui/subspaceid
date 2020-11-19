@@ -1,20 +1,27 @@
+"""
+Part of the content of this module is based on the original work:
+
+    "Subspace Identification for Linear Systems, Theory, Implementation, Applications"
+                           Van Overschee P., De Moor B.
+                        Kluwer Academic Publishers, (1996)
+
+In particular, the tests below for a first-order linear system:
+ - test_white_noise_output
+ - test_white_noise_input_n_output
+ - test_coloured_noise_output
+are described in book section 2.3.3: Notes on noisy measurements. Pages 47 trough 49.
+
+These are not very good tests since they are not completely deterministic. Still makes sense
+to use them in the code porting, to start with, as these are the algorithm test cases that
+the original book authors used to validate algorithm behavior.
+"""
+
+
 import numpy as np
 import scipy.signal
 import pytest
 
 from det_stat import subid_det
-
-"""
-These are not very good tests since they are not completely deterministic. Still makes sense
-to use them in the code porting, to start with, as these are the algorithm test cases that
-the original book authors used to validate algorithm behavior.
-
-The present tests for a first-order linear system:
- - test_white_noise_output
- - test_white_noise_input_n_output
- - test_coloured_noise_output
-are described in book section 2.3.3: Notes on noisy measurements. Pages 47 trough 49.
-"""
 
 
 INPUT_LENGTH = 1000
